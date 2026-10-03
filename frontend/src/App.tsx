@@ -1,5 +1,6 @@
 import type { Board } from './types'
 import { useState, useEffect } from 'react'
+import { Header } from './components/Header'
 
 export function App() {
   const [boards, setBoards] = useState<Board[]>([])
@@ -10,7 +11,7 @@ export function App() {
   }, [])
   return (
     <>
-      <h1>0ちゃんねる</h1>
+      <Header />
       <ul>
         {boards.map((board) => (
           <li key={board.id}>
