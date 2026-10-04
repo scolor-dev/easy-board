@@ -11,7 +11,9 @@ export function Header() {
             <nav>
                 <ul>
                     {tabs.map((tab) => (
-                        <li key={tab}>{tab}</li>
+                        <li key={tab}>
+                            <button type="button" className="tonal-button">{tab}</button>
+                        </li>
                     ))}
                 </ul>
             </nav>

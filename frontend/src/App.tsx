@@ -1,6 +1,8 @@
 import type { Board } from './types'
 import { useState, useEffect } from 'react'
 import { Header } from './components/Header'
+import { TrendingBoards } from './components/TrendingBoards'
+import { TrendingTags } from './components/TrendingTags'
 
 export function App() {
   const [boards, setBoards] = useState<Board[]>([])
@@ -12,14 +14,8 @@ export function App() {
   return (
     <>
       <Header />
-      <ul>
-        {boards.map((board) => (
-          <li key={board.id}>
-            <h2>{board.name}</h2>
-            <p>{board.description}</p>
-          </li>
-        ))}
-      </ul>
+      <TrendingBoards boards={boards} />
+      <TrendingTags />
     </>
   )
 }
