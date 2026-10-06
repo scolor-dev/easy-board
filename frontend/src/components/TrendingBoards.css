@@ -1,0 +1,56 @@
+.trending {
+    max-width: 600px;
+    margin: 32px auto;
+    padding: 16px 24px;
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.trending h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.trending ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.trending li {
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.trending li:last-child {
+    border-bottom: none;
+}
+
+.trending h3 {
+    margin: 0;
+}
+
+.trending li p {
+    margin: 4px 0 0;
+    color: #555;
+}
+
+/* 見出しは真ん中のまま、ドロップダウンだけ右上に置く */
+.trending-header {
+    position: relative;
+}
+
+.sort-select {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 32px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 16px;
+    background-color: #f5d9ec;
+    color: #3d1032;
+    font-size: 14px;
+    cursor: pointer;
+}
