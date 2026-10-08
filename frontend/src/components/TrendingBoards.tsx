@@ -2,11 +2,11 @@ import type { Board } from '../types'
 import { useState } from 'react'
 import './TrendingBoards.css'
 
-type Props = { boards: Board[] }
+type Props = {onSelect: (boards: Board) => void; boards: Board[]}
 
 type SortOrder = 'newest' | 'oldest' | 'popular'
 
-export function TrendingBoards({ boards }: Props) {
+export function TrendingBoards({ boards, onSelect }: Props) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
 
   return (
@@ -26,8 +26,10 @@ export function TrendingBoards({ boards }: Props) {
       <ul>
         {boards.map((board) => (
           <li key={board.id}>
+            <button type="button" onClick={() => onSelect(board)}>
             <h3>{board.name}</h3>
             <p>{board.description}</p>
+            </button>
           </li>
         ))}
       </ul>
