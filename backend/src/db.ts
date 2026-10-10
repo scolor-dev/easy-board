@@ -31,5 +31,17 @@ db.exec(`
   INSERT OR IGNORE INTO threads (id, boardId, title, postCount, createdAt, updatedAt) VALUES
     (1, 'Leagueoflegends', '初心者おすすめチャンプ', 0, '2026-10-01T09:00:00.000Z', '2026-10-01T09:00:00.000Z'),
     (2, 'Leagueoflegends', '今のメタについて',       0, '2026-10-01T10:00:00.000Z', '2026-10-01T12:00:00.000Z'),
-    (3, 'Fit',             '学食のおすすめ',         0, '2026-10-01T11:00:00.000Z', '2026-10-01T11:00:00.000Z')
+    (3, 'Fit',             ' 楽単について ',         0, '2026-10-01T11:00:00.000Z', '2026-10-01T11:00:00.000Z')
 `)
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS posts (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    threadId  INTEGER NOT NULL REFERENCES threads(id),
+    number    INTEGER NOT NULL,
+    name      TEXT    NOT NULL,
+    body      TEXT    NOT NULL,
+    createdAt TEXT    NOT NULL
+  )
+`)
+
