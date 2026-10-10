@@ -1,27 +1,37 @@
 import { Hono } from 'hono'
-import { boards, DEFAULT_NAME, nextId, posts, threads } from '../store.js'
 
 export const boardsRoute = new Hono()
 
-// 板の一覧
-boardsRoute.get('/', (c) => c.json(boards))
+import { db } from '../db.js'
 
-// その板のスレッド一覧 (新しいレスがついた順)
-boardsRoute.get('/:boardId/threads', (c) => {
-  const boardId = c.req.param('boardId')
-  if (!boards.some((b) => b.id === boardId)) {
-    return c.json({ error: '板が見つかりません' }, 404)
-  }
-  const list = threads
-    .filter((t) => t.boardId === boardId)
-    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-  return c.json(list)
+boardsRoute.get('/', (c) => {
+  const boards = db.prepare('SELECT id, name, description FROM boards ORDER BY rowid').all()
+  return c.json(boards)
 })
 
-// スレッド作成 (1レス目も同時に作る)
+boardsRoute.get('/:boardId/threads', (c) => {
+
+  const boardId = c.req.param('boardId')
+
+  const board = db.prepare('SELECT id FROM boards WHERE id = ?').get(boardId)
+  if (!board) {
+    return c.json({ error: '板が見つかりません' }, 404)
+  }
+
+  const threads = db
+    .prepare('SELECT * FROM threads WHERE boardId = ? ORDER BY updatedAt DESC')
+    .all(boardId)
+
+  return c.json(threads)
+})
+
+const DEFAULT_NAME = '名無しさん'
+
 boardsRoute.post('/:boardId/threads', async (c) => {
   const boardId = c.req.param('boardId')
-  if (!boards.some((b) => b.id === boardId)) {
+
+  const board = db.prepare('SELECT id FROM boards WHERE id = ?').get(boardId)
+  if (!board) {
     return c.json({ error: '板が見つかりません' }, 404)
   }
 
@@ -41,22 +51,24 @@ boardsRoute.post('/:boardId/threads', async (c) => {
   }
 
   const now = new Date().toISOString()
-  const thread = {
-    id: nextId.thread++,
-    boardId,
-    title,
-    postCount: 1,
-    createdAt: now,
-    updatedAt: now,
+
+  db.exec('BEGIN')
+  try {
+    const result = db
+      .prepare('INSERT INTO threads (boardId, title, postCount, createdAt, updatedAt) VALUES (?, ?, 1, ?, ?)')
+      .run(boardId, title, now, now)
+    const threadId = Number(result.lastInsertRowid)
+
+    db.prepare('INSERT INTO posts (threadId, number, name, body, createdAt) VALUES (?, 1, ?, ?, ?)')
+      .run(threadId, name || DEFAULT_NAME, body, now)
+
+    db.exec('COMMIT')
+
+    const thread = db.prepare('SELECT * FROM threads WHERE id = ?').get(threadId)
+    return c.json(thread, 201)
+  } catch (error) {
+    db.exec('ROLLBACK')
+    throw error
   }
-  threads.push(thread)
-  posts.push({
-    id: nextId.post++,
-    threadId: thread.id,
-    number: 1,
-    name: name || DEFAULT_NAME,
-    body,
-    createdAt: now,
-  })
-  return c.json(thread, 201)
 })
+
