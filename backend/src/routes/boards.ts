@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 
 export const boardsRoute = new Hono()
 
-import { db } from '../db.js'
+import { db, DEFAULT_NAME } from '../db.js'
 
 boardsRoute.get('/', (c) => {
   const boards = db.prepare('SELECT id, name, description FROM boards ORDER BY rowid').all()
@@ -24,8 +24,6 @@ boardsRoute.get('/:boardId/threads', (c) => {
 
   return c.json(threads)
 })
-
-const DEFAULT_NAME = '名無しさん'
 
 boardsRoute.post('/:boardId/threads', async (c) => {
   const boardId = c.req.param('boardId')
