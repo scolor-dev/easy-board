@@ -1,0 +1,20 @@
+/* 話題の板と同じカードの見た目 */
+.trending-tags {
+    max-width: 600px;
+    margin: 32px auto;
+    padding: 16px 24px;
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.trending-tags h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.trending-tags .placeholder {
+    margin: 0;
+    text-align: center;
+    color: #888;
+}

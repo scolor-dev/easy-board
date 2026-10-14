@@ -1,23 +1,27 @@
 import { Hono } from 'hono'
-import { DEFAULT_NAME, nextId, posts, threads } from '../store.js'
+import { db, DEFAULT_NAME } from '../db.js'
 
 export const threadsRoute = new Hono()
 
-// スレッド詳細 (スレッド情報とレス一覧)
 threadsRoute.get('/:threadId', (c) => {
-  const thread = threads.find((t) => t.id === Number(c.req.param('threadId')))
+  const threadId = Number(c.req.param('threadId'))
+
+  const thread = db.prepare('SELECT * FROM threads WHERE id = ?').get(threadId)
   if (!thread) {
     return c.json({ error: 'スレッドが見つかりません' }, 404)
   }
-  const threadPosts = posts
-    .filter((p) => p.threadId === thread.id)
-    .sort((a, b) => a.number - b.number)
-  return c.json({ thread, posts: threadPosts })
+
+  const posts = db
+    .prepare('SELECT * FROM posts WHERE threadId = ? ORDER BY number ASC')
+    .all(threadId)
+
+  return c.json({ thread, posts })
 })
 
-// レスを投稿
 threadsRoute.post('/:threadId/posts', async (c) => {
-  const thread = threads.find((t) => t.id === Number(c.req.param('threadId')))
+  const threadId = Number(c.req.param('threadId'))
+
+  const thread = db.prepare('SELECT * FROM threads WHERE id = ?').get(threadId)
   if (!thread) {
     return c.json({ error: 'スレッドが見つかりません' }, 404)
   }
@@ -34,16 +38,23 @@ threadsRoute.post('/:threadId/posts', async (c) => {
   }
 
   const now = new Date().toISOString()
-  const post = {
-    id: nextId.post++,
-    threadId: thread.id,
-    number: thread.postCount + 1,
-    name: name || DEFAULT_NAME,
-    body,
-    createdAt: now,
+  const number = Number(thread.postCount) + 1
+
+  db.exec('BEGIN')
+  try {
+    const result = db
+      .prepare('INSERT INTO posts (threadId, number, name, body, createdAt) VALUES (?, ?, ?, ?, ?)')
+      .run(threadId, number, name || DEFAULT_NAME, body, now)
+
+    db.prepare('UPDATE threads SET postCount = ?, updatedAt = ? WHERE id = ?')
+      .run(number, now, threadId)
+
+    db.exec('COMMIT')
+
+    const post = db.prepare('SELECT * FROM posts WHERE id = ?').get(Number(result.lastInsertRowid))
+    return c.json(post, 201)
+  } catch (error) {
+    db.exec('ROLLBACK')
+    throw error
   }
-  posts.push(post)
-  thread.postCount += 1
-  thread.updatedAt = now
-  return c.json(post, 201)
 })

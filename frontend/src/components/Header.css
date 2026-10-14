@@ -1,0 +1,38 @@
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: rgba(141, 68, 123, 0.8);
+}
+
+nav ul { 
+    display: flex;
+    gap: 16px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tonal-button {
+    height: 40px;
+    padding: 0 24px;
+    border: none;
+    border-radius: 20px;
+    background-color: #f5d9ec;
+    color: #3d1032;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.tonal-button:hover {
+    background-color: #c463a5;
+    box-shadow: 0 1px 20px rgba(55, 4, 236, 0.2);
+}
+
+.tonal-button:active {
+    background-color: #c25fa3;
+    box-shadow: none;
+}
