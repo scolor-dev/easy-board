@@ -11,3 +11,12 @@ export type Thread = {
   createdAt: string
   updatedAt: string
 }
+
+export type Post = {
+  id: number
+  threadId: number
+  number: number
+  name  : string
+  body: string
+  createdAt: string
+}
