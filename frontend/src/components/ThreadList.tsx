@@ -5,9 +5,10 @@ import './ThreadList.css'
 type Props = {
     board: Board
     onBack: () => void
+    onSelect: (thread: Thread) => void
 }
 
-export function ThreadList({ board, onBack }: Props) {
+export function ThreadList({ board, onBack, onSelect }: Props) {
     const [threads, setThreads] = useState<Thread[]>([])
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
@@ -37,10 +38,12 @@ export function ThreadList({ board, onBack }: Props) {
             <ul>
                 {threads.map((thread) => (
                     <li key={thread.id}>
-                        <h3>{thread.title}</h3>
-                        <p>投稿数: {thread.postCount}</p>
-                        <p>作成日: {new Date(thread.createdAt).toLocaleString("ja-JP")}</p>
-                        <p>更新日: {new Date(thread.updatedAt).toLocaleString("ja-JP")}</p>
+                        <button type="button" className="thread-button" onClick={() => onSelect(thread)}>
+                            <h3>{thread.title}</h3>
+                            <p>投稿数: {thread.postCount}</p>
+                            <p>作成日: {new Date(thread.createdAt).toLocaleString("ja-JP")}</p>
+                            <p>更新日: {new Date(thread.updatedAt).toLocaleString("ja-JP")}</p>
+                        </button>
                     </li>
                 ))}
             </ul>
